@@ -12,6 +12,10 @@ def input_error(func):
             return "Give me proper parameters, please."
         except IndexError:
             return "Give me proper parameters, please."
+        except TypeError:
+            return "Give me proper parameters, please."
+        except AttributeError:
+            return "Give me proper parameters, please."
 
     return wrapper
 
