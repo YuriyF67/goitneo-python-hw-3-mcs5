@@ -35,6 +35,7 @@ class Name(Field):
 
 
 class Phone(Field):
+    @input_error
     def __init__(self, number):
         if len(number) == 10 and number.isdigit():
             super().__init__(number)
@@ -43,7 +44,6 @@ class Phone(Field):
 
 
 class Birthday(Field):
-
     @input_error
     def __init__(self, birthday):
         if len(birthday) == 10 and birthday[2] == "." and birthday[5] == ".":
@@ -59,6 +59,7 @@ class Record:
         self.phones = []
         self.birthday = None
 
+    @input_error
     def add_phone(self, phone_number):
         phone = Phone(phone_number)
         self.phones.append(phone)
