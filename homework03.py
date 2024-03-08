@@ -46,10 +46,10 @@ class Birthday(Field):
 
     @input_error
     def __init__(self, birthday):
-        try:
+        if len(birthday) == 10 and birthday[2] == "." and birthday[5] == ".":
             self.date = datetime.strptime(birthday, "%d.%m.%Y").date()
             super().__init__(str(self.date))
-        except ValueError:
+        else:
             print("Invalid birthday format (DD.MM.YYYY)")
 
 
