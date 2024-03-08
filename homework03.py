@@ -35,7 +35,6 @@ class Name(Field):
 
 
 class Phone(Field):
-    @input_error
     def __init__(self, number):
         if len(number) == 10 and number.isdigit():
             super().__init__(number)
@@ -46,11 +45,15 @@ class Phone(Field):
 class Birthday(Field):
     @input_error
     def __init__(self, birthday):
-        if len(birthday) == 10 and birthday[2] == "." and birthday[5] == ".":
-            self.date = datetime.strptime(birthday, "%d.%m.%Y").date()
-            super().__init__(str(self.date))
-        else:
-            print("Invalid birthday format (DD.MM.YYYY)")
+        self.date = self.validate_date(birthday)
+        super().__init__(str(self.date))
+
+    def validate_date(self, birthday):
+        try:
+            date_object = datetime.strptime(birthday, "%d.%m.%Y").date()
+            return date_object
+        except ValueError:
+            raise ValueError("Invalid birthday format (DD.MM.YYYY)")
 
 
 class Record:
@@ -64,6 +67,7 @@ class Record:
         phone = Phone(phone_number)
         self.phones.append(phone)
 
+    @input_error
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
 
@@ -98,7 +102,7 @@ class Record:
 
 
 class AddressBook(UserDict):
-
+    @input_error
     def add_record(self, record):
         self.data[record.name.value] = record
 
@@ -150,26 +154,31 @@ def parse_input(user_input):
 def add_contact(args, book):
     name, phone = args
     existing_record = book.find(name)
-
-    if existing_record:
-        existing_record.add_phone(phone)
-        return f"Phone added for existing contact {name}."
+    if len(phone) == 10 and phone.isdigit():
+        if existing_record:
+            existing_record.add_phone(phone)
+            return f"Phone added for existing contact {name}."
+        else:
+            record = Record(name)
+            record.add_phone(phone)
+            book.add_record(record)
+            return "New contact added."
     else:
-        record = Record(name)
-        record.add_phone(phone)
-        book.add_record(record)
-        return "New contact added."
+        return "Invalid phone number format, must be 10 digits"
 
 
 @input_error
 def add_birthday(args, book):
     name, birthday = args
     record = book.find(name)
-    if record:
-        record.add_birthday(birthday)
-        return "Birthday added."
+    if len(birthday) == 10 and birthday[2] == "." and birthday[5] == ".":
+        if record and birthday:
+            record.add_birthday(birthday)
+            return "Birthday added."
+        else:
+            return f"Contact {name} not found."
     else:
-        return f"Contact {name} not found."
+        return "Invalid birthday format (DD.MM.YYYY)"
 
 
 @input_error
