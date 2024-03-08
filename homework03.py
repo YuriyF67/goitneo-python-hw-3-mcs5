@@ -43,6 +43,8 @@ class Phone(Field):
 
 
 class Birthday(Field):
+
+    @input_error
     def __init__(self, birthday):
         try:
             self.date = datetime.strptime(birthday, "%d.%m.%Y").date()
