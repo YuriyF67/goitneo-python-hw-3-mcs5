@@ -2,10 +2,25 @@ from collections import UserDict, defaultdict
 from datetime import datetime, timedelta
 
 
+def input_error(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError:
+            return "Give me proper parameters, please."
+        except KeyError:
+            return "Give me proper parameters, please."
+        except IndexError:
+            return "Give me proper parameters, please."
+
+    return wrapper
+
+
 class Field:
     def __init__(self, value):
         self.value = value
 
+    @input_error
     def __str__(self):
         return str(self.value)
 
@@ -116,20 +131,6 @@ class AddressBook(UserDict):
             else:
                 result += f"{'Monday'}: {', '.join(names)}\n"
         return result
-
-
-def input_error(func):
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except ValueError:
-            return "Give me proper parameters, please."
-        except KeyError:
-            return "Give me proper parameters, please."
-        except IndexError:
-            return "Give me proper parameters, please."
-
-    return wrapper
 
 
 def parse_input(user_input):
